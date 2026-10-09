@@ -1,68 +1,42 @@
 # Java Task 3: ATM Interface
 
-## Objective
+## Project overview
 
-Create a console-based ATM simulation in Java using object-oriented programming (OOP).
+A console-based ATM simulation written in Java. It demonstrates basic object-oriented design through account authentication, transaction handling, and an interactive menu.
 
-## Planned technology stack
+## Technologies
 
-- Java
-- Core Java and OOP
-- Console input and output
-- `ArrayList` for transaction history
+- Java 21
+- Git for version control
+- Core Java, including `BigDecimal`, collections, and console input/output
 
-## Required features
+## Implemented features
 
-### Authentication
+- Sign in with a User ID and PIN; access is denied after three failed attempts.
+- View the signed-in account's transaction history.
+- Deposit and withdraw money with positive-amount validation.
+- Transfer money between the demo accounts.
+- Check available funds before withdrawals and transfers, and report **Insufficient Funds** when the balance is too low.
+- Reject invalid menu selections, invalid amounts, unknown recipients, and transfers to the same account.
+- Show updated balances and record successful account operations in transaction history.
 
-- Ask for a User ID and PIN when the program starts.
-- Deny access after three incorrect authentication attempts.
+## Production classes
 
-### ATM menu and operations
+The application source is in `src/atm/`:
 
-Show a main menu with these options:
+| Class | Responsibility |
+| --- | --- |
+| `Main` | Creates the in-memory `Bank` and starts the `ATM`. |
+| `ATM` | Reads console input, authenticates users, displays the menu, and handles the interactive flow and messages. |
+| `Account` | Stores a user's credentials and balance; applies deposits and withdrawals and keeps transaction history in an `ArrayList`. |
+| `Bank` | Stores demo accounts, authenticates credentials, looks up accounts, and coordinates transfers. |
+| `Transaction` | Represents a completed operation with its type, amount, details, and time. |
 
-1. Transaction History
-2. Withdraw
-3. Deposit
-4. Transfer
-5. Quit
+Transfers are recorded in the sender's history as a withdrawal and in the recipient's history as a deposit.
 
-- Check that the account has enough balance before a withdrawal or transfer.
-- Display **Insufficient Funds** when the balance is too low for a withdrawal or transfer.
-- Store all transactions in an `ArrayList` and display them clearly in Transaction History.
+## Demo accounts
 
-### Required classes
-
-Use at least these five distinct classes:
-
-- `ATM` — manages the ATM menu and user interaction.
-- `Account` — stores account information and balance.
-- `Transaction` — represents a deposit, withdrawal, or transfer.
-- `Bank` — manages accounts and authentication.
-- `Main` — starts the program.
-
-## Optional recommendations
-
-- Add input checks for invalid menu choices and non-positive transaction amounts.
-- Show a clear result after each successful deposit, withdrawal, or transfer.
-
-## Implementation
-
-The console application is implemented in `src/atm/` with the required five
-classes:
-
-- `Main` starts the application.
-- `ATM` handles login prompts, the three-attempt limit, menu choices, input
-  validation, and user messages.
-- `Bank` stores the in-memory accounts, authenticates users, and coordinates
-  transfers.
-- `Account` stores the user ID, PIN, balance, and current-session transaction
-  history. Deposits and withdrawals reject non-positive amounts and record
-  successful operations.
-- `Transaction` stores the type, amount, details, and time of an operation.
-
-The Bank constructor provides these demo accounts:
+These credentials are defined in `Bank`:
 
 | User ID | PIN | Opening balance |
 | --- | --- | ---: |
@@ -70,32 +44,23 @@ The Bank constructor provides these demo accounts:
 | `user1002` | `2345` | 500.00 |
 | `user1003` | `3456` | 250.00 |
 
-Successful transfers update both balances. With the current `Account` interface,
-the sender's history records a withdrawal and the recipient's history records a
-deposit. Both are transaction records for the transfer.
+## Compile and run the application
 
-## Build and run with Java 21
-
-From this task directory in PowerShell, compile into the system temporary
-directory so generated class files are kept out of the repository:
+From this task directory in PowerShell, compile to a temporary directory and start the program:
 
 ```powershell
 $buildDir = Join-Path $env:TEMP 'oibsip-atm-build'
 New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
 javac --release 21 -d $buildDir src\atm\*.java
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 java -cp $buildDir atm.Main
 ```
 
-At login, use one of the demo credential pairs above.
+## Automated test harness
 
-## Automated tests
+The no-dependency harness is located at `test/atm/ATMTestHarness.java`. It checks account operations and history, authentication, transfer validation, login lockout, menu behavior, and scripted console transactions and failures.
 
-`test/atm/ATMTestHarness.java` is a small Java test harness with no external
-dependencies. It checks account balance/history behavior, Bank authentication
-and transfer validation, login lockout, menu and quit behavior, and scripted
-console transactions and failures.
-
-Run the harness from this task directory in PowerShell:
+Compile and run the harness from this task directory in PowerShell:
 
 ```powershell
 $testBuildDir = Join-Path $env:TEMP 'oibsip-atm-test-build'
@@ -105,27 +70,19 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 java -cp $testBuildDir atm.ATMTestHarness
 ```
 
-## Testing checklist
+No test result is asserted in this README. The harness was not run as part of this documentation update; use the command above to check the current code.
 
-- [x] Startup prompts for a User ID and PIN; valid credentials allow access.
-- [x] Three incorrect PIN attempts deny access.
-- [x] The menu shows Transaction History, Withdraw, Deposit, Transfer, and Quit.
-- [x] Deposits update the balance and appear in transaction history.
-- [x] Withdrawals with enough funds update the balance and appear in history.
-- [x] A withdrawal with insufficient funds displays **Insufficient Funds**.
-- [x] Successful transfers update both account balances and both histories.
-- [x] Transfers with insufficient funds display **Insufficient Funds**.
-- [x] Transfers reject missing recipients, the same account, and non-positive amounts.
-- [x] Deposits and withdrawals reject zero and negative amounts; invalid numeric input is handled.
-- [x] Transaction History clearly displays recorded transactions.
-- [x] Invalid menu choices are handled, and Quit exits the program.
-- [x] The required `ATM`, `Account`, `Transaction`, `Bank`, and `Main` classes compile.
+## Current limitations
 
-**Verification result:** Compiled with Java 21 (`javac 21.0.11`, `--release 21`).
-The automated harness completed with **13 passed, 0 failed**. Build output was
-written to the system temporary directory.
+- Demo accounts and balances are held in memory by `Bank`. They reset to their opening values whenever the application restarts.
+- Transaction history is also held in memory and is available only during the current application run.
+- The project is a console simulation. It does not connect to a database or a real banking service.
+- Demo credentials are stored directly in the source code and are for local demonstration only.
 
-## Implementation status
+## Screenshots and internship submission checklist
 
-**Implemented and verified.** The `screenshots/` and `output/` directories remain
-available for task evidence and generated output.
+No screenshot, demo video, or internship submission evidence is recorded here yet.
+
+- [ ] Capture and add screenshots to `screenshots/`.
+- [ ] Record and save a demo video, if required for the internship submission.
+- [ ] Complete the required internship submission steps and retain confirmation evidence.
